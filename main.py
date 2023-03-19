@@ -1,9 +1,15 @@
 
+import os
 import cv2
 
-# Video variables
+# Variables
 width = 1280
 height = 720
+folder_path = "Presentation_Slides"
+
+# Getting list of presentation Files
+pathImages = sorted(os.listdir(folder_path), key=len)
+print(pathImages)
 
 # Video Capture
 capture = cv2.VideoCapture(0)
