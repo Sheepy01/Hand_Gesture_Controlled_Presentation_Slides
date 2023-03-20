@@ -7,7 +7,6 @@ import numpy
 from cvzone.HandTrackingModule import HandDetector
 
 # Variables
-url = "https://192.168.43.11:8080/shot.jpg"
 width = 1280
 height = 720
 width_small = int(213*1)
@@ -18,13 +17,16 @@ gestureThreshold = 300
 buttonPressed = False
 buttonCounter = 0
 buttonDelay = 30
+annotations = [[]]
+annotationNumber = 0
+annotationStart = False
 
 # Getting list of presentation Files
 pathImages = sorted(os.listdir(folder_path), key=len)
 print(pathImages)
 
 # Video Capture
-capture = cv2.VideoCapture(url)
+capture = cv2.VideoCapture(0)
 capture.set(3, width)
 capture.set(4, height)
 
@@ -60,25 +62,60 @@ while True:
 
         # If hand is at the height of the face
         if center_y <= gestureThreshold:
+            annotationStart = False
 
             # Gesture-1 Left
             if fingers == [1,0,0,0,0]:
+                annotationStart = False                    
                 print("Left")
                 if imageNumber > 0:
                     buttonPressed = True
+                    annotations = [[]]
+                    annotationNumber = 0
                     imageNumber -= 1
             
             # Gesture-2 Right
             if fingers == [0,0,0,0,1]:
+                annotationStart = False
                 print("Right")
                 if imageNumber < len(pathImages) - 1:
                     buttonPressed = True
+                    annotations = [[]]
+                    annotationNumber = 0
                     imageNumber += 1
 
-        # Gesture - 3 Pointer
+        # Gesture - 4 Showing Pointer
         if fingers == [0,1,1,0,0]:
-            print("Pointer")
+            #print("Pointer")
             cv2.circle(imageCurrent, indexFinger, 10, (0, 0, 255), cv2.FILLED)
+            annotationStart = False
+            
+        # Gesture - 5 Drawing Pointer Line
+        if fingers == [0,1,0,0,0]:
+            if annotationStart is False:
+                annotationStart = True
+                annotationNumber += 1
+                annotations.append([])
+                print("Line")
+                print(f"annotationNumber: ", annotationNumber)
+            cv2.circle(imageCurrent, indexFinger, 10, (0, 0, 255), cv2.FILLED)
+            annotations[annotationNumber].append(indexFinger)
+            print(annotations)
+        else:
+            annotationStart = False
+
+        # Gesture - 6 Undo
+        if fingers == [0,1,1,1,0]:
+            print("Cleared")
+            if annotations:
+                if annotationNumber >= 0:
+                    annotations.pop(-1)
+                    annotationNumber -= 1
+                    buttonPressed = True
+                    print(annotationNumber)
+
+    else:
+        annotationStart = False
 
 
     # Switching between Button Pressed boolean
@@ -87,6 +124,11 @@ while True:
         if buttonCounter > buttonDelay:
             buttonCounter = 0
             buttonPressed = False
+
+    for i in range(len(annotations)):
+        for j in range(len(annotations[i])):
+            if j != 0:
+                cv2.line(imageCurrent, annotations[i][j-1], annotations[i][j], (0,0,255), 5)
 
     # showing webcam on top of the slides
     image_small = cv2.resize(image, (width_small, height_small))
