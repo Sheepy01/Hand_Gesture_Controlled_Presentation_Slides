@@ -1,6 +1,7 @@
 # Hand_Gesture_Controlled_Presentation_Slides
 This repo contains the submission for Intel OneAPI Hackathon 2023
 
+*About*:
 Hand Gesture controlled Presentation Slide using OpenCV is a project that aims to create an interactive way to control presentations using hand gestures. The project uses OpenCV, a popular computer vision library, to detect and recognize hand gestures in real-time. With this system, users can navigate through presentation slides using simple hand gestures without the need for a keyboard or mouse.
 
 This project includes a Python implementation that uses the OpenCV library to track the hand movements and recognize different hand gestures. The system is capable of detecting various gestures like swiping left or right, pointing, drawing over slides and undo the mistakes. These gestures are mapped to specific actions using algorithms that control the presentation slides.
